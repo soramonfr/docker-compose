@@ -1,0 +1,45 @@
+# Version de Docker Compose selon la version moteur Docker
+version: '3'
+
+# Services = Conteneurs
+services:
+  # Application Web offrant une interface graphique pour la gestion de notre base de données :
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+  # Base de données MySQL :
+  db:    
+    image: mysql:5.7
+    restart: always
+    # On définit les variables d'environnement que l'on souhaite utiliser :    
+    environment:        
+      MYSQL_ROOT_PASSWORD: root       
+      MYSQL_DATABASE: employees
+    ports:
+      - 3306:3306
+    # Spécifie les points de montage entre le système hôte et les conteneurs :
+    volumes:
+        # Stocke l'ensemble du contenu du dossier /var/lib/mysql dans un disque persistant
+        - db-volume:/var/lib/mysql
+        # Spécifie quel fichier partager entre ma db et adminer (fait un lien entre ces 2 fichiers)
+        - ./employees.sql:/docker-entrypoint-initdb.d/employees.sql
+# Je demande au moteur Docker de me créer un volume nommé db-volume, c'est le volume pour stocker les données de notre base de données.
+volumes: 
+  db-volume:
+
+# Restart always : démarrera automatiquement le conteneur en cas de redémarrage du serveur.
+# ports : On prend les numéros de port par défaut (ex : MySQL = port 3306).
+
+# Lancer la commande docker-compose up --build :
+# Si tout est OK, le résultat s'affiche sur la page suivante http://localhost:8080/
+
+# docker-compose kill pour arrêter.
+
+# Lister les conteneurs du Docker Compose :
+# docker-compose ls
+# -a ou --all : affiche aussi les conteneurs stoppés
+
+# Lister les images utilisées dans le docker-compose.yml :
+# docker-compose images
